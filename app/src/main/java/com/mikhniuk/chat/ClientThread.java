@@ -1,12 +1,12 @@
 package com.mikhniuk.chat;
 
-import android.content.Context;
-import android.widget.Toast;
-
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Observable;
 
@@ -15,17 +15,27 @@ import java.util.Observable;
  */
 public class ClientThread extends Observable implements Runnable {
     private Socket socket;
-    private String ip;
+    private String ip = "46.101.96.234";
     private String exception;
-    private int port;
+    private int port = 4444;
     private BufferedReader reader;
     private static OutputStream writer;
     private boolean finish;
     private String message;
+    /*private static ClientThread singleton;
 
-    ClientThread(String ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    public static ClientThread getSingleton(){
+        if(singleton == null){
+            singleton = new ClientThread();
+        }
+        return singleton;
+    }
+
+    private ClientThread() {
+        finish = false;
+    }*/
+
+    public ClientThread() {
         finish = false;
     }
 
@@ -67,12 +77,19 @@ public class ClientThread extends Observable implements Runnable {
         finish = true;
     }
 
-    public void sendMail(String mail, Context cont){
-        mail = mail + "+";
+    public void sendMail(String mail){
         try {
-            this.writer.write(mail.getBytes());
-            this.writer.flush();
-            Toast.makeText(cont, "OK", Toast.LENGTH_LONG).show();
+            final PrintWriter writer = new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream())),
+                    true);
+            final String finalMail = mail;
+            Thread tr = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    writer.println(finalMail);
+                }
+            });
+            tr.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

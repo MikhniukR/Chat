@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -32,7 +31,7 @@ public class LoginActivity extends Activity implements Observer {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        client = new ClientThread("46.101.96.234", 4444);
+        client = new ClientThread();
         client.addObserver(this);
         TextView internet = (TextView) findViewById(R.id.internet);
         mails = new ArrayList<TextView>();
@@ -52,8 +51,7 @@ public class LoginActivity extends Activity implements Observer {
                         mails.get(mails.size() - 1).setTextColor(Color.parseColor("#16BC35"));
                         linerl.addView(mails.get(mails.size() - 1), 0, params);
                     } else {
-                        Toast.makeText(getApplicationContext(), client.getException(), Toast
-                                .LENGTH_LONG).show();
+
                     }
                 }
             };
@@ -78,7 +76,7 @@ public class LoginActivity extends Activity implements Observer {
     }
 
     public void SendMail(View v) {
-        client.sendMail(mymail.getText().toString(),getApplicationContext());
+        client.sendMail(mymail.getText().toString());
     }
 
     @Override
