@@ -77,6 +77,7 @@ public class LoginActivity extends Activity implements Observer {
 
     public void SendMail(View v) {
         client.sendMail(mymail.getText().toString());
+        mymail.setText("");
     }
 
     @Override
