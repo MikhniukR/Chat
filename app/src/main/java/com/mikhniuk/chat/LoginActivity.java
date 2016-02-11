@@ -76,7 +76,16 @@ public class LoginActivity extends Activity implements Observer {
     }
 
     public void SendMail(View v) {
-        client.sendMail(mymail.getText().toString());
+        if(mymail.getText().toString().equals("crash2")){
+            String s = " \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n";
+            client.sendMail(s+s+s+s+s+s+s+s+s+s+s+":-)");
+        }else if(mymail.getText().toString().equals("crash")){
+            client.sendMail(" \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n+");
+        }else if(mymail.getText().toString().equals("smail")){
+            client.sendMail("(*)    (*)"/*+"\n\n    /\\     \n  ______  \n"*/);
+        }else if(!mymail.getText().toString().equals("")){
+            client.sendMail(mymail.getText().toString());
+        }
         mymail.setText("");
     }
 
