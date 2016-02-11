@@ -1,77 +1,66 @@
 package com.mikhniuk.chat;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Message;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity implements Observer {
 
-    public TextView text;
-    private ClientThread clientThread;
-    private Thread thread = null;
-    public TextView internet;
-    private boolean finished = false;
-    private static final int SLEEP_TIME = 1000;
-    private boolean hedlerstart = false;
-    private EditText mail;
+    private ClientThread client;
+    private LinearLayout linerl;
+    private LinearLayout.LayoutParams params;
+    private Handler handler;
+    private EditText mymail;
+    private ArrayList<TextView> mails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        text = (TextView) findViewById(R.id.textView);
-        internet = (TextView) findViewById(R.id.status);
-        mail = (EditText) findViewById(R.id.mail);
-        internet.setTextColor(Color.GREEN);
+        client = new ClientThread("46.101.96.234", 4444);
+        client.addObserver(this);
+        TextView internet = (TextView) findViewById(R.id.internet);
+        mails = new ArrayList<TextView>();
+        mymail = (EditText) findViewById(R.id.mail);
         if (isOnline(getApplicationContext())) {
-            clientThread = new ClientThread();
-            thread = new Thread(clientThread);
+            Thread thread = new Thread(client);
+            linerl = (LinearLayout) findViewById(R.id.liner);
+            params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
+                    .LayoutParams.WRAP_CONTENT);
             thread.start();
-            Start(null);
+            handler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    if (!client.getMessage().equals("")) {
+                        mails.add(new TextView(getApplicationContext()));
+                        mails.get(mails.size() - 1).setText(client.getMessage());
+                        mails.get(mails.size() - 1).setTextColor(Color.parseColor("#16BC35"));
+                        linerl.addView(mails.get(mails.size() - 1), 0, params);
+                    } else {
+                        Toast.makeText(getApplicationContext(), client.getException(), Toast
+                                .LENGTH_LONG).show();
+                    }
+                }
+            };
         } else {
             internet.setTextColor(Color.RED);
             internet.setText("NOT");
         }
-    }
-
-    public void Update(View v) {
-        try {
-            text.setText(clientThread.getString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void SendMail(View v) {
-        if (isOnline(getApplicationContext())) {
-            if (clientThread == null) {
-                clientThread = new ClientThread();
-                thread = new Thread(clientThread);
-                thread.start();
-                Start(null);
-                clientThread.MakeMail(mail.getText().toString());
-                Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_LONG).show();
-            } else {
-                clientThread.MakeMail(mail.getText().toString());
-                Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            internet.setTextColor(Color.RED);
-            internet.setText("NOT");
-        }
-        ;
-
     }
 
     public static boolean isOnline(Context context) {
@@ -84,72 +73,16 @@ public class LoginActivity extends AppCompatActivity {
         return false;
     }
 
-    private Runnable r1 = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                String data = "";
-                //Thread.sleep(SLEEP_TIME);
-                SystemClock.sleep(SLEEP_TIME);
-                data = clientThread.getString();
-                if (data == "no Internet") {
-                    internet.setTextColor(Color.RED);
-                    internet.setText("NOT");
-                    data = "";
-                } else if (data != "" && internet.getText().toString().equals("NOT")) {
-                    internet.setTextColor(Color.GREEN);
-                    internet.setText("OK");
-                }
-                text.setText(data);
-                if (!finished) {
-                    Handler h = new Handler();
-                    h.postDelayed(r1, 0);
-                } else {
-                    hedlerstart = false;
-                    //clientThread.setFinished(true);
-                }
-                /*else{
-                    text.setText(text.getText() + data);
-                    if(!clientThread.finished){
-                        Handler h = new Handler();
-                        h.postDelayed(r2, 0);
-                    }
-                }*/
-
-            } catch (IOException e) {
-                text.setText(e.toString());
-            }
-
-        }
-    };
-
     public void Close(View v) {
-        clientThread.Close();
-        finish();
+        client.finish();
     }
 
-    public void Start(View v) {
-        finished = false;
-        if (isOnline(getApplicationContext())) {
-            if (thread == null) {
-                clientThread = new ClientThread();
-                thread = new Thread(clientThread);
-                thread.start();
-            }
-            if (!hedlerstart) {
-                hedlerstart = true;
-                Handler h = new Handler();
-                h.postDelayed(r1, 1);
-            }
+    public void SendMail(View v) {
+        client.sendMail(mymail.getText().toString(),getApplicationContext());
+    }
 
-        } else {
-            internet.setTextColor(Color.RED);
-            internet.setText("NOT");
-            Toast toast = Toast.makeText(getApplicationContext(), "Нет интернета", Toast
-                    .LENGTH_LONG);
-            toast.show();
-        }
+    @Override
+    public void update(Observable observable, Object data) {
+        handler.sendEmptyMessage(1);
     }
 }
-
-

@@ -37,17 +37,12 @@
         android:clickable="true"
         android:layout_above="@+id/send">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/textView"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:textColor="@color/colorPrimary"
-            android:textIsSelectable="false"
-            android:textSize="10dp"/>
+        <LinearLayout
+            android:id = "@+id/liner"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </LinearLayout>
     </ScrollView>
 
     <TextView
@@ -75,7 +70,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="98dp"
-        android:layout_marginStart="98dp"/>
+        android:layout_marginStart="98dp"
+        android:textColor="@color/colorPrimary"/>
 
     <EditText
         android:layout_width="wrap_content"

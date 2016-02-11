@@ -1,5 +1,8 @@
 package com.mikhniuk.chat;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,97 +13,76 @@ import java.util.Observable;
 /**
  * Created by Рома on 06.02.2016.
  */
-public class ClientThread extends Observable implements Runnable  {
+public class ClientThread extends Observable implements Runnable {
     private Socket socket;
+    private String ip;
+    private String exception;
+    private int port;
     private BufferedReader reader;
-    private boolean finished = false;
-    private static final int SLEEP_TIME = 1000;
-    private static final int SERVER_PORT = 4444;
-    private String data;
-    private static final String SERVER_IP = "46.101.96.234";
     private static OutputStream writer;
+    private boolean finish;
+    private String message;
+
+    ClientThread(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
+        finish = false;
+    }
 
     @Override
     public void run() {
         try {
-            this.socket = new Socket(SERVER_IP, SERVER_PORT);
-            this.data = "";
-            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.socket = new Socket(ip, port);
             this.writer = socket.getOutputStream();
-            String s;
-
-            while (!data.equals("-")) {
-                try {
-                    Thread.sleep(SLEEP_TIME);
-                    if (!finished) {
-                        s = reader.readLine();
-                        if (s == null) {
-                            data = "no Internet";
-                        }
-                        data = s + "\n" + data;
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            while (!socket.isConnected()) {
+                Thread.sleep(100);
             }
-            socket.close();
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            while (!finish) {
+                message = reader.readLine();
+                setChanged();
+                notifyObservers();
+                Thread.sleep(100);
+            }
         } catch (IOException e) {
-            data = "no Internet";
+            message = "";
+            exception ="No Internet";
+            setChanged();
+            notifyObservers();
+        } catch (InterruptedException e) {
+            message = "";
+            exception ="Exception";
+            setChanged();
+            notifyObservers();
         } finally {
             try {
-                if (socket != null)
+                if(socket!=null)
                     socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
 
-        /*public boolean getFinished(){
-            return this.finished;
-        }*/
-
-    public void setFinished(boolean finished) {
-        this.finished = finished;
+    public void finish() {
+        finish = true;
     }
 
-    public boolean MakeMail(String mail){
+    public void sendMail(String mail, Context cont){
+        mail = mail + "+";
         try {
-            if(this.writer == null){
-                this.data += "null";
-            }
             this.writer.write(mail.getBytes());
             this.writer.flush();
-            return true;
-        } catch (IOException e) {
-            this.data += e.toString();
-            return false;
-        }catch(java.lang.NullPointerException e){
-            this.data += e.toString();
-            return false;
-        }
-    }
-
-    public void Close() {
-        try {
-            this.socket.close();
+            Toast.makeText(cont, "OK", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public String getString() throws IOException {
-        return data;
+    public String getMessage() {
+        return message;
     }
 
-        /*public String getString() throws IOException {
-            if (reader.ready())
-                return reader.readLine();
-            return "No data";
-        }
-
-        public String getStringForce() throws IOException {
-            return reader.readLine();
-        }*/
-
+    public String getException() {
+        return exception;
+    }
 }
