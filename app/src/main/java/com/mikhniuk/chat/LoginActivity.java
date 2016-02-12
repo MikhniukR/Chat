@@ -75,18 +75,39 @@ public class LoginActivity extends Activity implements Observer {
         client.finish();
     }
 
+    private static String crash(int n) {
+        String s = " \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n " +
+                "\n \n \n \n \n";//30
+        //s.length() == 30*(2^n)
+        for (int i = 0; i < n; i++) {
+            s = s + s;
+        }
+        s += ":-)";
+        return s;
+    }
+
     public void SendMail(View v) {
-        if(mymail.getText().toString().equals("crash2")){
-            String s = " \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n";
-            client.sendMail(s+s+s+s+s+s+s+s+s+s+s+":-)");
-        }else if(mymail.getText().toString().equals("crash")){
-            client.sendMail(" \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n+");
-        }else if(mymail.getText().toString().equals("smail")){
-            client.sendMail("(*)    (*)"/*+"\n\n    /\\     \n  ______  \n"*/);
-        }else if(!mymail.getText().toString().equals("")){
+        if (mymail.getText().toString().equals("crash2")) {
+            client.sendMail(crash(5));
+        } else if (mymail.getText().toString().equals("crash")) {
+            client.sendMail(" \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n " +
+                    "\n \n \n \n \n \n \n \n \n \n:-)");
+        }else if (check(mymail.getText().toString())) {
             client.sendMail(mymail.getText().toString());
         }
         mymail.setText("");
+    }
+
+    public boolean check(String s) {
+        if (s.length() == 0) {
+            return false;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != ' ') {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
