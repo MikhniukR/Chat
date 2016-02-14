@@ -49,7 +49,7 @@ public class LoginActivity extends Activity implements Observer {
                     if (!client.getMessage().equals("")) {
                         mails.add(new TextView(getApplicationContext()));
                         mails.get(mails.size() - 1).setText(client.getMessage());
-                        mails.get(mails.size() - 1).setTextColor(Color.parseColor("#16BC35"));
+                        mails.get(mails.size() - 1).setTextColor(Color.parseColor("#007C00"));
                         linerl.addView(mails.get(mails.size() - 1), 0, params);
                     } else {
 
@@ -81,7 +81,7 @@ public class LoginActivity extends Activity implements Observer {
 
     public void Close(View v) {
         client.finish();
-        //finish();
+        finish();
     }
 
     private static String crash(int n) {

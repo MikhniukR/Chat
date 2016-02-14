@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -19,7 +18,6 @@ public class ClientThread extends Observable implements Runnable {
     private String exception;
     private int port = 4444;
     private BufferedReader reader;
-    private static OutputStream writer;
     private boolean finish;
     private String message;
     private static ClientThread singleton;
@@ -45,7 +43,6 @@ public class ClientThread extends Observable implements Runnable {
     public void run() {
         try {
             this.socket = new Socket(ip, port);
-            this.writer = socket.getOutputStream();
             while (!socket.isConnected()) {
                 Thread.sleep(100);
             }
@@ -77,6 +74,7 @@ public class ClientThread extends Observable implements Runnable {
 
     public void finish() {
         finish = true;
+        singleton = null;
     }
 
     public void sendMail(String mail){
