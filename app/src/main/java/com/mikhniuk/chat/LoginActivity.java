@@ -81,6 +81,7 @@ public class LoginActivity extends Activity implements Observer {
 
     public void Close(View v) {
         client.finish();
+        //finish();
     }
 
     private static String crash(int n) {
