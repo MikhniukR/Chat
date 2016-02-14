@@ -22,23 +22,25 @@ public class ClientThread extends Observable implements Runnable {
     private static OutputStream writer;
     private boolean finish;
     private String message;
-    /*private static ClientThread singleton;
+    private static ClientThread singleton;
 
     public static ClientThread getSingleton(){
         if(singleton == null){
             singleton = new ClientThread();
+            Thread thread = new Thread(singleton);
+            thread.start();
         }
         return singleton;
     }
 
     private ClientThread() {
         finish = false;
-    }*/
-
+    }
+/*
     public ClientThread() {
         finish = false;
     }
-
+*/
     @Override
     public void run() {
         try {

@@ -2,6 +2,7 @@ package com.mikhniuk.chat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -25,23 +27,22 @@ public class LoginActivity extends Activity implements Observer {
     private LinearLayout.LayoutParams params;
     private Handler handler;
     private EditText mymail;
+    private TextView internet;
     private ArrayList<TextView> mails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        client = new ClientThread();
+        client = ClientThread.getSingleton();
         client.addObserver(this);
-        TextView internet = (TextView) findViewById(R.id.internet);
+        internet = (TextView) findViewById(R.id.internet);
         mails = new ArrayList<TextView>();
         mymail = (EditText) findViewById(R.id.mail);
         if (isOnline(getApplicationContext())) {
-            Thread thread = new Thread(client);
             linerl = (LinearLayout) findViewById(R.id.liner);
             params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
                     .LayoutParams.WRAP_CONTENT);
-            thread.start();
             handler = new Handler() {
                 @Override
                 public void handleMessage(Message msg) {
@@ -59,6 +60,13 @@ public class LoginActivity extends Activity implements Observer {
             internet.setTextColor(Color.RED);
             internet.setText("NOT");
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Toast.makeText(getApplicationContext(), "ok", Toast.LENGTH_LONG);
+
     }
 
     public static boolean isOnline(Context context) {
