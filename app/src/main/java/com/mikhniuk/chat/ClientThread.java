@@ -57,12 +57,10 @@ public class ClientThread extends Observable implements Runnable {
             message = "";
             exception ="No Internet";
             setChanged();
-            notifyObservers();
         } catch (InterruptedException e) {
             message = "";
             exception ="Exception";
             setChanged();
-            notifyObservers();
         } finally {
             try {
                 if(socket!=null)

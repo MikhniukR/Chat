@@ -34,9 +34,11 @@ public class LoginActivity extends Activity implements Observer {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        client = ClientThread.getSingleton();
-        client.addObserver(this);
-        internet = (TextView) findViewById(R.id.internet);
+        if (isOnline(getApplicationContext())) {
+            client = ClientThread.getSingleton();
+            client.addObserver(this);
+        }
+        internet = (TextView) findViewById(R.id.status);
         mails = new ArrayList<TextView>();
         mymail = (EditText) findViewById(R.id.mail);
         if (isOnline(getApplicationContext())) {
@@ -96,6 +98,14 @@ public class LoginActivity extends Activity implements Observer {
     }
 
     public void SendMail(View v) {
+        if(!isOnline(getApplicationContext())){
+            internet.setTextColor(Color.RED);
+            internet.setText("NOT");
+            Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_LONG).show();
+            return;
+        }else if(internet.getText().toString().equals("NOT")){
+            Toast.makeText(getApplicationContext(), "Restart app becouse tread finished after no internet", Toast.LENGTH_LONG).show();
+        }
         if (mymail.getText().toString().equals("crash2")) {
             client.sendMail(crash(5));
         } else if (mymail.getText().toString().equals("crash")) {
