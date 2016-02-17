@@ -34,6 +34,7 @@ public class LoginActivity extends Activity implements Observer {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        client = null;
         if (isOnline(getApplicationContext())) {
             client = ClientThread.getSingleton();
             client.addObserver(this);
@@ -103,16 +104,41 @@ public class LoginActivity extends Activity implements Observer {
             internet.setText("NOT");
             Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_LONG).show();
             return;
-        }else if(internet.getText().toString().equals("NOT")){
-            Toast.makeText(getApplicationContext(), "Restart app becouse tread finished after no internet", Toast.LENGTH_LONG).show();
+        }else if(internet.getText().toString().equals("NOT") && client != null){
+            Toast.makeText(getApplicationContext(), "Restart app tread finished after no internet", Toast.LENGTH_SHORT).show();
+            return;
         }
-        if (mymail.getText().toString().equals("crash2")) {
+        if (mymail.getText().toString().equals("crash2") && client != null ) {
             client.sendMail(crash(5));
-        } else if (mymail.getText().toString().equals("crash")) {
+        } else if (mymail.getText().toString().equals("crash")&& client != null) {
             client.sendMail(" \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n " +
                     "\n \n \n \n \n \n \n \n \n \n:-)");
-        }else if (check(mymail.getText().toString())) {
+        }else if (check(mymail.getText().toString())&& client != null) {
             client.sendMail(mymail.getText().toString());
+        }else if(client == null){
+            Toast.makeText(getApplicationContext(), "Restart app ...", Toast.LENGTH_SHORT).show();
+            return;
+            /*client = ClientThread.getSingleton();
+            client.addObserver(this);
+            linerl = (LinearLayout) findViewById(R.id.liner);
+            params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
+                    .LayoutParams.WRAP_CONTENT);
+            handler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    if (!client.getMessage().equals("")) {
+                        mails.add(new TextView(getApplicationContext()));
+                        mails.get(mails.size() - 1).setText(client.getMessage());
+                        mails.get(mails.size() - 1).setTextColor(Color.parseColor("#007C00"));
+                        linerl.addView(mails.get(mails.size() - 1), 0, params);
+                    } else {
+
+                    }
+                }
+            };
+            internet.setText("OK");
+            internet.setTextColor(Color.GREEN);
+            client.sendMail(mymail.getText().toString());*/
         }
         mymail.setText("");
     }
