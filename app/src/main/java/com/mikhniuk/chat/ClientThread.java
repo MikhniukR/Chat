@@ -15,6 +15,7 @@ import java.util.Observable;
 public class ClientThread extends Observable implements Runnable {
     private Socket socket;
     private String ip = "46.101.96.234";
+    private String user_id;
     private String exception;
     private int port = 4444;
     private BufferedReader reader;
@@ -22,8 +23,8 @@ public class ClientThread extends Observable implements Runnable {
     private String message;
     private static ClientThread singleton;
 
-    public static ClientThread getSingleton(){
-        if(singleton == null){
+    public static ClientThread getSingleton() {
+        if (singleton == null) {
             singleton = new ClientThread();
             Thread thread = new Thread(singleton);
             thread.start();
@@ -34,11 +35,27 @@ public class ClientThread extends Observable implements Runnable {
     private ClientThread() {
         finish = false;
     }
-/*
-    public ClientThread() {
-        finish = false;
+
+    /*
+        public ClientThread() {
+            finish = false;
+        }
+    */
+
+    private String combine(String s){
+        String ans = "";
+        int i = s.length()-1;
+        while(s.charAt(i) != ' '){
+            ans = s.charAt(i) + ans;
+            i--;
+        }
+        return ans;
     }
-*/
+
+    public String getUser_id(){
+        return user_id;
+    }
+
     @Override
     public void run() {
         try {
@@ -47,6 +64,10 @@ public class ClientThread extends Observable implements Runnable {
                 Thread.sleep(100);
             }
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            message = reader.readLine();
+            user_id = combine(message);
+            setChanged();
+            notifyObservers();
             while (!finish) {
                 message = reader.readLine();
                 setChanged();
@@ -54,18 +75,16 @@ public class ClientThread extends Observable implements Runnable {
                 Thread.sleep(100);
             }
         } catch (IOException e) {
-            message = "";
-            exception ="No Internet";
-            setChanged();
+            e.printStackTrace();
         } catch (InterruptedException e) {
-            message = "";
-            exception ="Exception";
-            setChanged();
+            e.printStackTrace();
+
         } finally {
             try {
-                if(socket!=null)
+                if (socket != null)
                     socket.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -75,16 +94,15 @@ public class ClientThread extends Observable implements Runnable {
         singleton = null;
     }
 
-    public void sendMail(String mail){
+    public void sendMail(final String mail) {
         try {
             final PrintWriter writer = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(socket.getOutputStream())),
                     true);
-            final String finalMail = mail;
             Thread tr = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    writer.println(finalMail);
+                    writer.println(mail);
                 }
             });
             tr.start();
